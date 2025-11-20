@@ -1,0 +1,43 @@
+Options -Indexes
+Options +FollowSymLinks
+
+RewriteEngine On
+RewriteBase /
+
+# Supprimer le # de l'URL
+RewriteCond %{THE_REQUEST} ^[A-Z]+\s/([^#]+)#([^\s]+) [NC]
+RewriteRule ^ /%1?%2 [L,R=301,NE]
+
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Add trailing slash to directories
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^(.*[^/])$ /$1/ [L,R=301]
+
+# Hide .html suffix and file names
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([^/]+)/?$ $1.html [L]
+
+# Rewrite URL to hide file extensions and file names
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([^/]+)/?$ index.php?file=$1 [L]
+
+# 301 permanent redirect all .html to non .html
+RewriteCond %{THE_REQUEST} \.html
+RewriteRule ^(.*)\.html$ /$1 [R=301,L]
+
+RewriteCond %{HTTP_HOST} ^www\.michcraft\.fr$ [NC]
+RewriteRule ^(.*)$ http://michcraft.fr/$1 [R=301,L]
+
+ErrorDocument 404 /404.html
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+</IfModule>
